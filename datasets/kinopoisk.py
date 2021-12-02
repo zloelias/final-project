@@ -1,23 +1,36 @@
 import glob
-from datasets import concatenate_datasets, load_dataset
+from datasets import concatenate_datasets, load_dataset, Dataset
 
 neg = glob.glob("./data/kinopoisk/dataset/neg/*")
 neu = glob.glob("./data/kinopoisk/dataset/neu/*")
 pos = glob.glob("./data/kinopoisk/dataset/pos/*")
 
-kinopoisk_dataset1 = load_dataset('text', data_files=neg)
-kinopoisk_dataset1 = kinopoisk_dataset1.map(lambda x: {'text': x['text'], 'labels': 2, 'label_name': 'negative'})
+data = []
 
-kinopoisk_dataset2 = load_dataset('text', data_files=neu)
-kinopoisk_dataset2 = kinopoisk_dataset2.map(lambda x: {'text': x['text'], 'labels': 0, 'label_name': 'neutral'})
+for file in neg:
+    with open(file, 'r') as f:
+        data.append({'text': f.read(), 'labels': 2, 'label_name': 'negative'})
+        #print('--------')
+        #print(data[-1])
 
-kinopoisk_dataset3 = load_dataset('text', data_files=pos)
-kinopoisk_dataset3 = kinopoisk_dataset3.map(lambda x: {'text': x['text'], 'labels': 1, 'label_name': 'positive'})
+for file in neu:
+    with open(file, 'r') as f:
+        data.append({'text': f.read(), 'labels': 0, 'label_name': 'neutral'})
+        #print('--------')
+        #print(data[-1])
 
-kinopoisk_dataset = concatenate_datasets([kinopoisk_dataset1['train'], kinopoisk_dataset2['train'], kinopoisk_dataset3['train']])
+for file in pos:
+    with open(file, 'r') as f:
+        data.append({'text': f.read(), 'labels': 1, 'label_name': 'positive'})
+        #print('--------')
+        #print(data[-1])
 
+import pandas as pd
+
+df = pd.DataFrame(data).sample(frac=1)
+df.dropna()
+
+kinopoisk_dataset = Dataset.from_pandas(df)
 kinopoisk_dataset = kinopoisk_dataset.train_test_split(test_size=0.1, train_size=0.9)
-
-
 kinopoisk_dataset.push_to_hub(repo_id='zloelias/kinopoisk-reviews')
 
