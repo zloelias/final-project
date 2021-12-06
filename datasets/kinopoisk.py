@@ -7,21 +7,27 @@ pos = glob.glob("./data/kinopoisk/dataset/pos/*")
 
 data = []
 
+
+def clearRating(s):
+    for i in range(10):
+        s = s.replace(str(i)+' из 10', '')
+    return s
+
 for file in neg:
     with open(file, 'r') as f:
-        data.append({'text': f.read(), 'labels': 2, 'label_name': 'negative'})
+        data.append({'text': clearRating(f.read()), 'labels': 2, 'label_name': 'negative'})
         #print('--------')
         #print(data[-1])
 
 for file in neu:
     with open(file, 'r') as f:
-        data.append({'text': f.read(), 'labels': 0, 'label_name': 'neutral'})
+        data.append({'text': clearRating(f.read()), 'labels': 0, 'label_name': 'neutral'})
         #print('--------')
         #print(data[-1])
 
 for file in pos:
     with open(file, 'r') as f:
-        data.append({'text': f.read(), 'labels': 1, 'label_name': 'positive'})
+        data.append({'text': clearRating(f.read()), 'labels': 1, 'label_name': 'positive'})
         #print('--------')
         #print(data[-1])
 
